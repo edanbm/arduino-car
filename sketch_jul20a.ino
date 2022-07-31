@@ -58,7 +58,14 @@ void stopMotor()
   digitalWrite(in3, LOW);
   digitalWrite(in4, LOW);
 }
-
+void vaccumOn()
+{
+  digitalWrite(mC1, HIGH);
+}
+void vaccumOff()
+{
+  digitalWrite(mC1, LOW);
+}
 void loop()
 {
   #ifdef DEBUG
@@ -67,6 +74,7 @@ void loop()
     Serial.println("Left:"+iFLeft);
     #endif
    foward();
+   vaccumOn();
    if (digitalRead(iFRight) == 0 || digitalRead(iFLeft) == 0)
    {
     stopMotor();

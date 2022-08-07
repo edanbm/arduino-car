@@ -1,29 +1,4 @@
-/*
- WiFi Web Server LED Blink
 
- A simple web server that lets you blink an LED via the web.
- This sketch will print the IP address of your WiFi Shield (once connected)
- to the Serial monitor. From there, you can open that address in a web browser
- to turn on and off the LED on pin 5.
-
- If the IP address of your shield is yourAddress:
- http://yourAddress/H turns the LED on
- http://yourAddress/L turns it off
-
- This example is written for a network using WPA encryption. For
- WEP or WPA, change the Wifi.begin() call accordingly.
-
- Circuit:
- * WiFi shield attached
- * LED attached to pin 5
-
- created for arduino 25 Nov 2012
- by Tom Igoe
-
-ported for sparkfun esp32 
-31.01.2017 by Jan Hendrik Berlin
- 
- */
 /////////////////////////////////////////////////////////////////
 #define DEBUG 0
 #define in1  12
@@ -36,14 +11,16 @@ ported for sparkfun esp32
 #define iFLeft  35
 //////////////////////////////////////////////////////////////////
 #include <WiFi.h>
-
+#include "index.h" 
 const char* ssid     = "CodeItWithMe";
 const char* password = "code1991";
-
+bool isManual = false;
 WiFiServer server(80);
+
 
 void setup()
 {
+    
     Serial.begin(115200);
     pinMode(5, OUTPUT);      // set the LED pin mode
 
@@ -111,19 +88,17 @@ void loop(){
           if (currentLine.length() == 0) {
             // HTTP headers always start with a response code (e.g. HTTP/1.1 200 OK)
             // and a content-type so the client knows what's coming, then a blank line:
-            client.println("HTTP/1.1 200 OK");
-            client.println("Content-type:text/html");
-            client.println();
-            client.println(" <style> a:link, a:visited {  background-color: #f44336;  color: white; padding: 14px 25px; width: 100%; height: 50%; text-align: center; text-decoration: none;  display: inline-block} a:hover, a:active { background-color: red; }</style>");
+//            client.println("HTTP/1.1 200 OK");
+//            client.println("Content-type:text/html");
+//            client.println();
+//            client.println(" <style> a:link, a:visited {  background-color: #f44336;  color: white; padding: 14px 25px; width: 100%; height: 50%; text-align: center; text-decoration: none;  display: inline-block} a:hover, a:active { background-color: red; }</style>");
+//
+//            // the content of the HTTP response follows the header:
+//            client.print("<a href=\"/autoMove\">Auto Move</a><br>");
+//            client.print("<a href=\"/Stop\">Stop</a><br>");
+//            client.print("<button href=\"/autoMove\">Move by itself</button>");
+            client.print(MAIN_page);
 
-            // the content of the HTTP response follows the header:
-            client.print("<a href=\"/autoMove\">Auto Move</a><br>");
-            client.print("<a href=\"/Stop\">Stop</a><br>");
-            client.print("<button href=\"/autoMove\">Move by itself</button>");
-            client.print("<button href=\"/Stop\">Stop</button>");
-            // The HTTP response ends with another blank line:
-            client.println();
-            // break out of the while loop:
             break;
           } else {    // if you got a newline, then clear currentLine:
             currentLine = "";
@@ -133,13 +108,34 @@ void loop(){
         }
 
         // Check to see if the client request was "GET /H" or "GET /L":
-        if (currentLine.endsWith("GET /autoMove")) {
-          autoMove();
-        }
-        if (currentLine.endsWith("GET /Stop")) {
-          stopMotor();
-          vaccumOff();// GET /L turns the LED off
-        }
+              if (currentLine.endsWith("GET /auto")) {
+        autoMove();
+        isManual = false;
+      }
+      if (currentLine.endsWith("GET /stop")) {
+        stopMotor();
+        vaccumOff();// GET /L turns the LED off
+      }
+      if (currentLine.endsWith("GET /manual"))
+    {
+      isManual = true;
+    }
+    if (currentLine.endsWith("GET /forward") && isManual == true)
+    {
+      foward();
+      }
+      if (currentLine.endsWith("GET /backwards") && isManual == true)
+    {
+      backward();
+      }
+      if (currentLine.endsWith("GET /left") && isManual == true)
+    {
+      left();
+      }
+      if (currentLine.endsWith("GET /right") && isManual == true)
+    {
+      right();
+      }
       }
     }
     // close the connection:

@@ -12,8 +12,8 @@
 //////////////////////////////////////////////////////////////////
 #include <WiFi.h>
 #include "index.h" 
-const char* ssid     = "CodeItWithMe";
-const char* password = "code1991";
+const char* ssid     = "espNet";
+const char* password = "88888888";
 bool isManual = false;
 WiFiServer server(80);
 
@@ -23,7 +23,8 @@ void setup()
     
     Serial.begin(115200);
     pinMode(5, OUTPUT);      // set the LED pin mode
-
+    stopMotor();
+    vaccumOff();
     delay(10);
 
     // We start by connecting to a WiFi network
@@ -52,6 +53,7 @@ void setup()
 
 //////////////////////////////////////////
 
+
   #ifdef DEBUG
     Serial.begin(115200);
    #endif
@@ -64,6 +66,7 @@ void setup()
   pinMode(iFRight, INPUT);
   pinMode(iFLeft, INPUT);
 
+ 
   stopMotor();
   vaccumOff();
 ///////////////////////////////////////////
@@ -72,6 +75,7 @@ void setup()
 int value = 0;
 
 void loop(){
+ Serial.println(WiFi.localIP());
  WiFiClient client = server.available();   // listen for incoming clients
 
   if (client) {                             // if you get a client,
@@ -135,6 +139,14 @@ void loop(){
       if (currentLine.endsWith("GET /right") && isManual == true)
     {
       right();
+      }
+      if (currentLine.endsWith("GET /vacOff"))
+      {
+        vaccumOff();
+      }
+      if (currentLine.endsWith("GET /vacOn"))
+      {
+        vaccumOn();
       }
       }
     }

@@ -1,7 +1,4 @@
 const char MAIN_page[] PROGMEM = R"=====(
-
-
-
 <!DOCTYPE html>
 <html>
 <head>
@@ -70,42 +67,22 @@ a:hover, a:active {
 <div class="Middle">
   <a class= "conButton" href="/left" target="_blank">Left</a>
   <svg height="110" width="100">
+    <a href = "/stop">
     <circle cx = "50" cy = "50" r = "48" stroke = "black" stroke-width="3" fill = "red"/>
+    </a>
   </svg>
     
   <a class= "conButton" href="/right" target="_blank">Right</a>
 </div>
 <div class="Bottom">
+  <a class= "conButton" href="/vacOff" target="_blank">Off</a>
   <a class= "conButton" href="/backwards" target="_blank">Backwards</a>
+  <a class= "conButton" href="/vacOn" target="_blank">On</a>
 </div>
   </center>
 </div>
-
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 )=====";

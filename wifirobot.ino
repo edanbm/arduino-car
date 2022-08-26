@@ -11,52 +11,53 @@
 #define iFLeft  35
 //////////////////////////////////////////////////////////////////
 #include <WiFi.h>
-#include "index.h" 
+#include "index.h"
 const char* ssid     = "espNet";
 const char* password = "88888888";
 bool isManual = false;
+bool moveAuto = false;
 WiFiServer server(80);
 
 
 void setup()
 {
-    
-    Serial.begin(115200);
-    pinMode(5, OUTPUT);      // set the LED pin mode
-    stopMotor();
-    vaccumOff();
-    delay(10);
 
-    // We start by connecting to a WiFi network
+  Serial.begin(115200);
+  pinMode(5, OUTPUT);      // set the LED pin mode
+  stopMotor();
+  vaccumOff();
+  delay(10);
 
-    Serial.println();
-    Serial.println();
-    Serial.print("Connecting to ");
-    Serial.println(ssid);
+  // We start by connecting to a WiFi network
 
-    WiFi.begin(ssid, password);
+  Serial.println();
+  Serial.println();
+  Serial.print("Connecting to ");
+  Serial.println(ssid);
 
-    while (WiFi.status() != WL_CONNECTED) {
-        delay(500);
-        Serial.print(".");
-    }
+  WiFi.begin(ssid, password);
 
-    Serial.println("");
-    Serial.println("WiFi connected.");
-    Serial.println("IP address: ");
-    Serial.println(WiFi.localIP());
-    
-    server.begin();
-    
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(500);
+    Serial.print(".");
+  }
 
+  Serial.println("");
+  Serial.println("WiFi connected.");
+  Serial.println("IP address: ");
+  Serial.println(WiFi.localIP());
+
+  server.begin();
 
 
-//////////////////////////////////////////
 
 
-  #ifdef DEBUG
-    Serial.begin(115200);
-   #endif
+  //////////////////////////////////////////
+
+
+#ifdef DEBUG
+  Serial.begin(115200);
+#endif
   pinMode(in1, OUTPUT);
   pinMode(in2, OUTPUT);
   pinMode(in3, OUTPUT);
@@ -66,17 +67,16 @@ void setup()
   pinMode(iFRight, INPUT);
   pinMode(iFLeft, INPUT);
 
- 
+
   stopMotor();
   vaccumOff();
-///////////////////////////////////////////
+  ///////////////////////////////////////////
 }
 
 int value = 0;
 
-void loop(){
- Serial.println(WiFi.localIP());
- WiFiClient client = server.available();   // listen for incoming clients
+void loop() {
+  WiFiClient client = server.available();   // listen for incoming clients
 
   if (client) {                             // if you get a client,
     Serial.println("New Client.");           // print a message out the serial port
@@ -92,15 +92,15 @@ void loop(){
           if (currentLine.length() == 0) {
             // HTTP headers always start with a response code (e.g. HTTP/1.1 200 OK)
             // and a content-type so the client knows what's coming, then a blank line:
-//            client.println("HTTP/1.1 200 OK");
-//            client.println("Content-type:text/html");
-//            client.println();
-//            client.println(" <style> a:link, a:visited {  background-color: #f44336;  color: white; padding: 14px 25px; width: 100%; height: 50%; text-align: center; text-decoration: none;  display: inline-block} a:hover, a:active { background-color: red; }</style>");
-//
-//            // the content of the HTTP response follows the header:
-//            client.print("<a href=\"/autoMove\">Auto Move</a><br>");
-//            client.print("<a href=\"/Stop\">Stop</a><br>");
-//            client.print("<button href=\"/autoMove\">Move by itself</button>");
+            //            client.println("HTTP/1.1 200 OK");
+            //            client.println("Content-type:text/html");
+            //            client.println();
+            //            client.println(" <style> a:link, a:visited {  background-color: #f44336;  color: white; padding: 14px 25px; width: 100%; height: 50%; text-align: center; text-decoration: none;  display: inline-block} a:hover, a:active { background-color: red; }</style>");
+            //
+            //            // the content of the HTTP response follows the header:
+            //            client.print("<a href=\"/autoMove\">Auto Move</a><br>");
+            //            client.print("<a href=\"/Stop\">Stop</a><br>");
+            //            client.print("<button href=\"/autoMove\">Move by itself</button>");
             client.print(MAIN_page);
 
             break;
@@ -112,43 +112,50 @@ void loop(){
         }
 
         // Check to see if the client request was "GET /H" or "GET /L":
-              if (currentLine.endsWith("GET /auto")) {
-        autoMove();
-        isManual = false;
+        if (currentLine.endsWith("GET /auto")) {
+          moveAuto = true;
+          isManual = false;
+        }
+        if (currentLine.endsWith("GET /stop")) {
+          stopMotor();
+          vaccumOff();// GET /L turns the LED off
+          moveAuto = false;
+        }
+        if (currentLine.endsWith("GET /manual"))
+        {
+          isManual = true;
+          moveAuto = false;
+        }
+        if (currentLine.endsWith("GET /forward") && isManual == true)
+        {
+          foward();
+        }
+        if (currentLine.endsWith("GET /backwards") && isManual == true)
+        {
+          backward();
+        }
+        if (currentLine.endsWith("GET /left") && isManual == true)
+        {
+          left();
+        }
+        if (currentLine.endsWith("GET /right") && isManual == true)
+        {
+          right();
+        }
+        if (currentLine.endsWith("GET /vacOff"))
+        {
+          vaccumOff();
+        }
+        if (currentLine.endsWith("GET /vacOn"))
+        {
+          vaccumOn();
+        }
+        if (moveAuto == true)
+        {
+          autoMove();
+        }
       }
-      if (currentLine.endsWith("GET /stop")) {
-        stopMotor();
-        vaccumOff();// GET /L turns the LED off
-      }
-      if (currentLine.endsWith("GET /manual"))
-    {
-      isManual = true;
-    }
-    if (currentLine.endsWith("GET /forward") && isManual == true)
-    {
-      foward();
-      }
-      if (currentLine.endsWith("GET /backwards") && isManual == true)
-    {
-      backward();
-      }
-      if (currentLine.endsWith("GET /left") && isManual == true)
-    {
-      left();
-      }
-      if (currentLine.endsWith("GET /right") && isManual == true)
-    {
-      right();
-      }
-      if (currentLine.endsWith("GET /vacOff"))
-      {
-        vaccumOff();
-      }
-      if (currentLine.endsWith("GET /vacOn"))
-      {
-        vaccumOn();
-      }
-      }
+
     }
     // close the connection:
     client.stop();
@@ -192,7 +199,11 @@ void stopMotor()
 }
 void vaccumOn()
 {
-  digitalWrite(mC1, HIGH);
+  for (int i = 0; i < 255; i = i + 2)
+  {
+    delay(1);
+    digitalWrite(mC1, i);
+  }
 }
 void vaccumOff()
 {
@@ -200,21 +211,27 @@ void vaccumOff()
 }
 void autoMove()
 {
-  #ifdef DEBUG
-    delay(50);
-    Serial.println("Right:"+String(digitalRead(iFRight)));
-    Serial.println("Left:"+iFLeft);
-    #endif
-   foward();
-   vaccumOn();
-   if (digitalRead(iFRight) == 0 || digitalRead(iFLeft) == 0)
-   {
+#ifdef DEBUG
+  delay(50);
+  Serial.println("Right:" + String(digitalRead(iFRight)));
+  Serial.println("Left:" + iFLeft);
+#endif
+  int startingTime = 0;
+  bool vacRunning = false;
+  foward();
+  startingTime = millis();
+  vaccumOn();
+  
+  Serial.println(iFRight);
+  Serial.println("hi"); 
+  if (digitalRead(iFRight) == 0 || digitalRead(iFLeft) == 0)
+  {
     stopMotor();
     delay(100);
     backward();
     delay(250);
     right();
     delay(250);
-   }
-   delay(10);  
+  }
+  delay(10);
 }

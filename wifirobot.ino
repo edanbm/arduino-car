@@ -12,12 +12,12 @@
 //////////////////////////////////////////////////////////////////
 #include <WiFi.h>
 #include "index.h"
-const char* ssid     = "espNet";
+const char* ssid     = "Hi";
 const char* password = "88888888";
+
 bool isManual = false;
 bool moveAuto = false;
 WiFiServer server(80);
-
 
 void setup()
 {
@@ -136,11 +136,11 @@ void loop() {
         }
         if (currentLine.endsWith("GET /left") && isManual == true)
         {
-          left();
+          left45deg();
         }
         if (currentLine.endsWith("GET /right") && isManual == true)
         {
-          right();
+          right45deg();
         }
         if (currentLine.endsWith("GET /vacOff"))
         {
@@ -196,6 +196,32 @@ void stopMotor()
   digitalWrite(in2, LOW);
   digitalWrite(in3, LOW);
   digitalWrite(in4, LOW);
+}
+void right45deg()
+{
+  digitalWrite(in1, HIGH);
+  digitalWrite(in2, LOW);
+  digitalWrite(in3, LOW);
+  digitalWrite(in4, HIGH);
+  delay(650);
+  digitalWrite(in1, LOW);
+  digitalWrite(in2, LOW);
+  digitalWrite(in3, LOW);
+  digitalWrite(in4, LOW);
+   
+}
+void left45deg()
+{
+  digitalWrite(in1, LOW);
+  digitalWrite(in2, HIGH);
+  digitalWrite(in3, HIGH);
+  digitalWrite(in4, LOW);
+  delay(650);
+  digitalWrite(in1, LOW);
+  digitalWrite(in2, LOW);
+  digitalWrite(in3, LOW);
+  digitalWrite(in4, LOW);
+   
 }
 void vaccumOn()
 {
